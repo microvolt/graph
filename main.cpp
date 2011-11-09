@@ -111,7 +111,7 @@ public:
 	}
 
 	template <typename Cb> 
-	void DFS(Cb &cb, vector <string> &order = vector <string> ())
+	map<string, string>  DFS(Cb &cb, vector <string> &order = vector <string> ())
 	{
 		string empty;
 		map<string, string> child_parent;
@@ -147,16 +147,18 @@ public:
 					}
 			}
 		}
-			
+		return child_parent;	
 	}
 
 	template <typename Cb>
 	void print_dfs(Cb &cb)
 	{
-		DFS(cb);
-		map<string, string>::iterator it = child_parent.begin();
-		for(; it != child_parent.end(); it++)
-			cout<<'edge'<<it->first<<' '<<it->second'\t';
+		map<string, string> cp = DFS(cb);
+		map<string, string>::iterator it = cp.begin();
+		for(; it != cp.end(); it++)
+		{
+			cout<<'edge'<<it->first<<' '<<it->second<<endl;
+		}
 	}
 
 	/*void Topological_sort()
@@ -245,14 +247,14 @@ public:
 		return temp;
 	}*/
 
-	void SCC()
+	/*void SCC()
 	{
         DFSCallback cb;
 		DFS(cb);
 		Graph g;/// = transpose_graph();
 		g.DFS(cb);
 		g.print_dfs(cb);
-	}
+	}*/
 
 	void make_set(string name, map<string, int> &rank, map<string, string> &child_parent)
 	{
@@ -316,10 +318,6 @@ public:
             }
         }
 
-       /* for(; it_e != edges.end(); it_e++)        // убрать
-        {
-            cout<<it_e->second.first<<' '<<it_e->second.second<<endl;   //
-        }*/
 		for(; it_e != edges.end(); it_e++)
 		{
 			if(find_set(it_e->second.first, child_parent) != find_set(it_e->second.second, child_parent))

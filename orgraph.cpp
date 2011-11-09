@@ -109,7 +109,7 @@ public:
 	}
 
 	template <typename Cb> 
-	void DFS(Cb &cb, vector <string> &order = vector <string> ())
+	map<string, string> DFS(Cb &cb, vector <string> &order = vector <string> ())
 	{
 		string empty;
 		map<string, string> child_parent;
@@ -145,16 +145,18 @@ public:
 					}
 			}
 		}
-			
+		return child_parent;	
 	}
 
 	template <typename Cb>
 	void print_dfs(Cb &cb)
 	{
-		DFS(cb);
-		map<string, string>::iterator it = child_parent.begin();
-		for(; it != child_parent.end(); it++)
-			cout<<'edge'<<it->first<<' '<<it->second'\t';
+		map<string, string> cp = DFS(cb);
+		map<string, string>::iterator it = cp.begin();
+		for(; it != cp.end(); it++)
+		{
+			cout<<'edge'<<it->first<<' '<<it->second<<endl;
+		}
 	}
 
 	void Topological_sort()
@@ -228,13 +230,53 @@ public:
 		return temp;
 	}
 
-	template <typename Cb> 
-	void SCC(Cb &cb)
+	void SCC()
 	{
+        DFSCallback cb;
 		DFS(cb);
 		Graph g = transpose_graph();
 		g.DFS(cb);
 		g.print_dfs(cb);
+	}
+
+	void initialize_single_source(string name, map<string, string> &child_parent = map<string, string> (), map<string, int> &distance = map<string, int> ())
+	{
+		map< string, map<string, int> >::iterator it = vertices.begin();
+		string empty;
+		for(; it != vertices.end(); it++)
+		{
+			child_parent.insert(make_pair(it->first, empty));
+			distance.insert(make_pair(it->first, 1000000));
+		}
+		distance[name] = 0;
+	}
+
+	void relax(string name1,string name2, int weight, map<string, string> &child_parent = map<string, string> (), map<string, int> &distance = map<string, int> ())
+	{
+		if(distance[name2] > distance[name1] + weight)
+		{
+			distance[name2] = distance[name1] + weight;
+			child_parent[name2] = name1;
+		}
+	}
+
+	void Dijkstra(string name)
+	{
+		map<string, string> child_parent;
+		map<string, int> distance;
+		map<string, int> set = map<string, int> ();
+		map<int, string> the_queue;
+		initialize_single_source(name, child_parent, distance);
+		while(!the_queue.empty())
+		{
+			map<int, string>::iterator it = the_queue.begin();
+			set.insert(make_pair(it->second, it->first));
+			map<string, int> *adj = get_adj_list(it->second);
+			map<string, int>::iterator it_a = adj->begin();
+			for(; it_a != adj->end(); it_a++)
+				relax(it->second, it_a->first, it_a->second, child_parent, distance);
+			the_queue.erase(it);
+		}
 	}
 	
 };
